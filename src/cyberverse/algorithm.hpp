@@ -12,3 +12,5 @@
 
 #include "cyberverse/algorithm/container/fixed_ring_buffer.hpp"
 #include "cyberverse/algorithm/container/sharded_queue.hpp"
+#include "cyberverse/algorithm/container/spsc_queue.hpp"
+#include "cyberverse/algorithm/container/triple_buffer.hpp"

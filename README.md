@@ -103,9 +103,48 @@ buffer.push(2);
 // buffer.at(0) == 1, buffer.back() == 2
 ```
 
+## spsc_queue
+
+`cyberverse/algorithm/container/spsc_queue.hpp` is a fixed-capacity queue for
+one producer and one consumer. The storage is allocated once in the constructor;
+`try_push` and `try_pop` are lock-free and never allocate. The queue exposes
+`capacity() - 1` usable slots and returns `false` from `try_push` when full
+rather than overwriting retained entries.
+
+```cpp
+cyberverse::algorithm::spsc_queue<int> queue(64);
+if (queue.try_push(42)) {
+  // published to the consumer
+}
+```
+
+Only one producer and one consumer may call the queue concurrently. There is no
+blocking, no drop counter, and no multi-producer support; the caller owns those
+policies.
+
+## triple_buffer
+
+`cyberverse/algorithm/container/triple_buffer.hpp` is a lock-free latest-value
+buffer for one writer and one reader. The writer fills `write_slot()` and calls
+`publish()`; the reader calls `read()` and receives the latest published value.
+Three slots ensure that the writer never overwrites the reader's current slot,
+so a reader may hold a stale value while the writer publishes newer values.
+
+```cpp
+cyberverse::algorithm::triple_buffer<frame_state> buffer;
+buffer.write_slot() = state;
+buffer.publish();
+const frame_state& latest = buffer.read();
+```
+
+The reference returned by `read()` is valid until the next `read()` on the same
+reader thread. Only one reader is supported. No allocation occurs after
+construction.
+
 ## Build, test, and benchmark
 
-Tests are built and run under `/tmp`, never inside the repository.
+Tests are built and run under `/tmp`, never inside the repository. The suite covers
+`fixed_ring_buffer`, `sharded_queue`, `spsc_queue`, and `triple_buffer`.
 
 ```bash
 cmake -S . -B /tmp/cyberverse-algorithm-test

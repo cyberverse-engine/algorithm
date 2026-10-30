@@ -10,7 +10,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(cyberverse_algorithm_tests fixed_ring_buffer_test.cpp sharded_queue_test.cpp)
+add_executable(
+  cyberverse_algorithm_tests
+  fixed_ring_buffer_test.cpp
+  sharded_queue_test.cpp
+  spsc_queue_test.cpp
+  triple_buffer_test.cpp
+)
 
 target_link_libraries(
   cyberverse_algorithm_tests
